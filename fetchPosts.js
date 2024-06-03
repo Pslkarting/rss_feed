@@ -12,7 +12,7 @@ function displayMessage(message) {
 
 // Fetch list of blog post files from the repository
 async function fetchBlogPosts() {
-  const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/?ref=${branch}`;
+  const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents?ref=${branch}`;
 
   try {
     displayMessage('Fetching files from GitHub...');
@@ -30,7 +30,8 @@ async function fetchBlogPosts() {
     displayMessage('Filtered blog posts: ' + JSON.stringify(blogPosts));
 
     const blogPostContents = await Promise.all(blogPosts.map(async (post) => {
-      const contentResponse = await fetch(post.download_url);
+      const rawContentUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${post.path}`;
+      const contentResponse = await fetch(rawContentUrl);
 
       if (!contentResponse.ok) {
         throw new Error(`Failed to fetch content for ${post.name}`);
