@@ -4,11 +4,19 @@ const repo = 'rss_feed';
 const branch = 'main'; // or the branch name you are using
 const token = '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'; // Replace with your new personal access token
 
+// Function to display messages in the overlay
+function displayMessage(message) {
+  const messageElement = document.createElement('p');
+  messageElement.textContent = message;
+  document.getElementById('rss-feed').appendChild(messageElement);
+}
+
 // Fetch list of blog post files from the repository
 async function fetchBlogPosts() {
   const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/?ref=${branch}`;
-  
+
   try {
+    displayMessage('Fetching files from GitHub...');
     const response = await fetch(apiUrl, {
       headers: {
         'Authorization': `token ${token}`
@@ -20,11 +28,11 @@ async function fetchBlogPosts() {
     }
 
     const files = await response.json();
-    console.log('Fetched files:', files);
+    displayMessage('Fetched files: ' + JSON.stringify(files));
 
     // Filter and fetch content of markdown files
     const blogPosts = files.filter(file => file.name.endsWith('.md'));
-    console.log('Filtered blog posts:', blogPosts);
+    displayMessage('Filtered blog posts: ' + JSON.stringify(blogPosts));
 
     const blogPostContents = await Promise.all(blogPosts.map(async (post) => {
       const contentResponse = await fetch(post.download_url, {
@@ -41,11 +49,12 @@ async function fetchBlogPosts() {
       return { title: post.name.replace('.md', ''), content };
     }));
 
-    console.log('Fetched blog post contents:', blogPostContents);
+    displayMessage('Fetched blog post contents: ' + JSON.stringify(blogPostContents));
 
     return blogPostContents;
 
   } catch (error) {
+    displayMessage('Error fetching blog posts: ' + error.message);
     console.error('Error fetching blog posts:', error);
     return [];
   }
@@ -56,7 +65,7 @@ async function displayBlogPosts() {
   const blogPosts = await fetchBlogPosts();
 
   if (blogPosts.length === 0) {
-    document.getElementById('rss-feed').innerHTML = '<p>No blog posts found or an error occurred.</p>';
+    displayMessage('No blog posts found or an error occurred.');
     return;
   }
 
