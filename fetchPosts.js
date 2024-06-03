@@ -2,7 +2,6 @@
 const owner = 'Pslkarting';
 const repo = 'rss_feed';
 const branch = 'main'; // or the branch name you are using
-const token = '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'; // Replace with your new personal access token
 
 // Function to display messages in the overlay
 function displayMessage(message) {
@@ -17,11 +16,7 @@ async function fetchBlogPosts() {
 
   try {
     displayMessage('Fetching files from GitHub...');
-    const response = await fetch(apiUrl, {
-      headers: {
-        'Authorization': `token ${token}`
-      }
-    });
+    const response = await fetch(apiUrl);
 
     if (!response.ok) {
       throw new Error(`GitHub API returned status ${response.status}`);
@@ -35,11 +30,7 @@ async function fetchBlogPosts() {
     displayMessage('Filtered blog posts: ' + JSON.stringify(blogPosts));
 
     const blogPostContents = await Promise.all(blogPosts.map(async (post) => {
-      const contentResponse = await fetch(post.download_url, {
-        headers: {
-          'Authorization': `token ${token}`
-        }
-      });
+      const contentResponse = await fetch(post.download_url);
 
       if (!contentResponse.ok) {
         throw new Error(`Failed to fetch content for ${post.name}`);
