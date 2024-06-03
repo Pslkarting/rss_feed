@@ -13,10 +13,11 @@ function displayMessage(message) {
 // Fetch list of blog post files from the repository
 async function fetchBlogPosts() {
   const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents?ref=${branch}`;
+  const corsProxy = 'https://cors-anywhere.herokuapp.com/';
 
   try {
     displayMessage('Fetching files from GitHub...');
-    const response = await fetch(apiUrl);
+    const response = await fetch(corsProxy + apiUrl);
 
     if (!response.ok) {
       throw new Error(`GitHub API returned status ${response.status}`);
@@ -31,7 +32,7 @@ async function fetchBlogPosts() {
 
     const blogPostContents = await Promise.all(blogPosts.map(async (post) => {
       const rawContentUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${post.path}`;
-      const contentResponse = await fetch(rawContentUrl);
+      const contentResponse = await fetch(corsProxy + rawContentUrl);
 
       if (!contentResponse.ok) {
         throw new Error(`Failed to fetch content for ${post.name}`);
